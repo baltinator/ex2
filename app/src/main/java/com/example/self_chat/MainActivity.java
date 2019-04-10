@@ -35,6 +35,10 @@ public class MainActivity extends AppCompatActivity implements
 
         recyclerView.setAdapter(adapter);
 
+        if (savedInstanceState != null) {
+            messages = savedInstanceState.getParcelableArrayList(MESSAGE_VIEW_KEY);
+        }
+
         adapter.submitList(messages);
 
         final EditText messageInput = findViewById(R.id.message_input);
@@ -60,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-//        outState.putParcelableArray(MESSAGE_VIEW_KEY, messages);
+        outState.putParcelableArrayList(MESSAGE_VIEW_KEY, messages);
     }
 
     @Override
