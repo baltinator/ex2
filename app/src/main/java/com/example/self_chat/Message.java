@@ -12,7 +12,7 @@ public class Message implements Parcelable {
         this.text = message;
     }
 
-    protected Message(Parcel in) {
+    private Message(Parcel in) {
         text = in.readString();
     }
 

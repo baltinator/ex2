@@ -5,16 +5,12 @@ import android.support.annotation.NonNull;
 import android.support.v7.recyclerview.extensions.ListAdapter;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
-import android.text.Editable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
-public class MessageRecyclerUtils {
+class MessageRecyclerUtils {
     static class MessageCallback extends DiffUtil.ItemCallback<Message> {
 
         @Override
@@ -35,7 +31,7 @@ public class MessageRecyclerUtils {
 
     static class MessageAdapter extends ListAdapter<Message, MessageHolder> {
 
-        public MessageAdapter() {
+        MessageAdapter() {
             super(new MessageCallback());
         }
 
@@ -58,9 +54,9 @@ public class MessageRecyclerUtils {
     }
 
     static class MessageHolder extends RecyclerView.ViewHolder {
-        public final TextView text;
+        final TextView text;
 
-        public MessageHolder(@NonNull View itemView) {
+        MessageHolder(@NonNull View itemView) {
             super(itemView);
             text = itemView.findViewById(R.id.message_text);
         }
