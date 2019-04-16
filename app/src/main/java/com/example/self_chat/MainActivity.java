@@ -1,5 +1,7 @@
 package com.example.self_chat;
 
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -9,20 +11,23 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements
-        MessageRecyclerUtils.SendClickCallback {
+        MessageRecyclerUtils.SendClickCallback, MessageRecyclerUtils.MessageClickCallback {
 
     private static final String MESSAGE_VIEW_KEY = "messages_view";
     private static final String EMPTY_STR = "";
     private static final String EMPTY_MESSAGE_ERR = "You can't send an empty message, oh silly!";
+    private final static String SP_ALL_MESSAGES = "self.chat.messages";
 
     private MessageRecyclerUtils.MessageAdapter adapter
             = new MessageRecyclerUtils.MessageAdapter();
 
     private ArrayList<Message> messages = new ArrayList<>();
+    private Gson gson;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,9 +39,17 @@ public class MainActivity extends AppCompatActivity implements
                 LinearLayoutManager.VERTICAL, false));
 
         recyclerView.setAdapter(adapter);
+        adapter.callback = this;
+
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        String messagesListGson = sp.getString(SP_ALL_MESSAGES, null);
+        gson = new Gson();
 
         if (savedInstanceState != null) {
             messages = savedInstanceState.getParcelableArrayList(MESSAGE_VIEW_KEY);
+        } else if (messagesListGson != null) {
+            messages = gson.fromJson(messagesListGson,
+                    new TypeToken<ArrayList<Message>>(){}.getType());
         }
 
         adapter.submitList(messages);
@@ -73,5 +86,22 @@ public class MainActivity extends AppCompatActivity implements
         messagesCopy.add(msg);
         this.messages = messagesCopy;
         this.adapter.submitList(this.messages);
+        this.saveMessages();
+    }
+
+    @Override
+    public void onMessageClick(Message msg) {
+        ArrayList<Message> messagesCopy = new ArrayList<>(this.messages);
+        messagesCopy.remove(msg);
+        this.messages = messagesCopy;
+        this.adapter.submitList(this.messages);
+        this.saveMessages();
+    }
+
+    private void saveMessages() {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString(SP_ALL_MESSAGES, gson.toJson(this.messages));
+        editor.apply();
     }
 }

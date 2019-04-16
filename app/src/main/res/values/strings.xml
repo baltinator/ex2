@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">self-chat</string>
+    <string name="delete_message_title">Delete Message</string>
+    <string name="delete_message_question">"Are you sure?"</string>
 </resources>

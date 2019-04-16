@@ -1,6 +1,8 @@
 package com.example.self_chat;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.support.annotation.NonNull;
 import android.support.v7.recyclerview.extensions.ListAdapter;
 import android.support.v7.util.DiffUtil;
@@ -29,11 +31,17 @@ class MessageRecyclerUtils {
         void onSendClick(Message msg);
     }
 
+    interface MessageClickCallback {
+        void onMessageClick(Message msg);
+    }
+
     static class MessageAdapter extends ListAdapter<Message, MessageHolder> {
 
         MessageAdapter() {
             super(new MessageCallback());
         }
+
+        public MessageClickCallback callback;
 
         @NonNull @Override
         public MessageHolder onCreateViewHolder(@NonNull ViewGroup parent, int itemType) {
@@ -42,7 +50,30 @@ class MessageRecyclerUtils {
             View itemView = LayoutInflater.from(context)
                             .inflate(R.layout.item_one_message, parent, false);
 
-            return new MessageHolder(itemView);
+            final MessageHolder holder = new MessageHolder(itemView);
+
+            holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    new AlertDialog.Builder(context)
+                            .setTitle(R.string.delete_message_title)
+                            .setMessage(R.string.delete_message_question)
+                            .setPositiveButton(android.R.string.yes,
+                                    new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    Message message = getItem(holder.getAdapterPosition());
+                                    if (callback != null)
+                                        callback.onMessageClick(message);
+                                }
+                            })
+
+                            .setNegativeButton(android.R.string.no, null)
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .show();
+                    return true;
+                }
+            });
+            return holder;
 
         }
 
